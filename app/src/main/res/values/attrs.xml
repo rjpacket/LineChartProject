@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="LineChartView">
+        <attr name="back_color" format="reference|color" />
+        <attr name="bar_color" format="reference|color" />
+        <attr name="line_color" format="reference|color" />
+        <attr name="dot_color" format="reference|color" />
+        <attr name="chart_type" format="integer" />
+    </declare-styleable>
+</resources>
