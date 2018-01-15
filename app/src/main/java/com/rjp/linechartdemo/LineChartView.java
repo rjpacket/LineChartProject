@@ -126,6 +126,7 @@ public class LineChartView extends View {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 downX = currentX;
+                getParent().requestDisallowInterceptTouchEvent(true);
                 if (!mScroller.isFinished()) {
                     mScroller.abortAnimation();
                 }

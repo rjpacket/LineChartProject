@@ -9,20 +9,37 @@
     tools:context="com.rjp.linechartdemo.MainActivity"
     >
 
-    <com.rjp.linechartdemo.LineChartView
-        android:id="@+id/line_chart"
+    <ScrollView
+        android:id="@+id/scroll_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:back_color="#eb1c42"
-        />
+        >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            >
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="800dp"
+                />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:text="切换"
-        android:gravity="center"
-        android:layout_marginTop="50dp"
-        android:onClick="switchType"
-        />
+            <com.rjp.linechartdemo.LineChartView
+                android:id="@+id/line_chart"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:back_color="#eb1c42"
+                />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:text="切换"
+                android:gravity="center"
+                android:layout_marginTop="50dp"
+                android:onClick="switchType"
+                />
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>
