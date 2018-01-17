@@ -56,6 +56,7 @@ public class LineChartView extends View {
 
     //记录坐标
     private float downX;
+    private float downY;
     private Scroller mScroller;
     private int mMinimumVelocity;
     private int mMaximumVelocity;
@@ -63,6 +64,7 @@ public class LineChartView extends View {
     private Path mPath;
     private int dialogX;
     private int dialogY;
+    private int touchSlop;
 
     public LineChartView(Context context) {
         this(context, null);
@@ -112,6 +114,7 @@ public class LineChartView extends View {
 
         //惯性滑动部分
         ViewConfiguration viewConfiguration = ViewConfiguration.get(mContext);
+        touchSlop = viewConfiguration.getScaledTouchSlop();
         mScroller = new Scroller(mContext);
         // 惯性滑动最低速度要求 低于这个速度认为是触摸
         mMinimumVelocity = viewConfiguration.getScaledMinimumFlingVelocity();
@@ -123,20 +126,26 @@ public class LineChartView extends View {
     public boolean onTouchEvent(MotionEvent event) {
         obtainVelocityTracker();
         float currentX = event.getX();
+        float currentY = event.getY();
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 downX = currentX;
-                getParent().requestDisallowInterceptTouchEvent(true);
+                downY = currentY;
                 if (!mScroller.isFinished()) {
                     mScroller.abortAnimation();
                 }
                 break;
             case MotionEvent.ACTION_MOVE:
                 float dx = currentX - downX;
-                scrollTo((int) (getScrollX() - dx), 0);
-                computeY();
-                invalidate();
-                downX = currentX;
+                float dy = currentY - downY;
+                if(Math.abs(dx) > Math.abs(dy)){
+                    getParent().requestDisallowInterceptTouchEvent(true);
+                    scrollTo((int) (getScrollX() - dx), 0);
+                    computeXY();
+                    invalidate();
+                    downX = currentX;
+                    downY = currentY;
+                }
                 break;
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
@@ -154,7 +163,10 @@ public class LineChartView extends View {
         return true;
     }
 
-    private void computeY() {
+    /**
+     * 计算指示器的位置
+     */
+    private void computeXY() {
         int scrollX = getScrollX();
         dialogX = (int) (scrollX * 1.0 / MAX_SCROLL_X * (viewWidth - lineWidth)) + scrollX + lineWidth / 2;
         int size = bars.size();
@@ -181,7 +193,7 @@ public class LineChartView extends View {
         if (mScroller.computeScrollOffset()) {
             int x = mScroller.getCurrX();
             scrollTo(x, 0);
-            computeY();
+            computeXY();
             postInvalidate();
         }
     }
@@ -296,21 +308,12 @@ public class LineChartView extends View {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        /**
-         * 高度一定是知道的，但是宽度需要计算和适配，不能为0，否则看不见
-         */
         viewWidth = MeasureSpec.getSize(widthMeasureSpec);
-        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
-
         viewHeight = topHeight + lineHeight * 2;
+        setMeasuredDimension(viewWidth, viewHeight);
 
-        if (widthMode == MeasureSpec.AT_MOST) {
-            setMeasuredDimension(dp2px(mContext, 240), viewHeight);
-        } else {
-            setMeasuredDimension(viewWidth, viewHeight);
-        }
         compute();
-        computeY();
+        computeXY();
     }
 
     public int dp2px(Context context, float dpValue) {
